@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,18 +11,20 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImp implements UserService, UserDetailsService {
+public class UserDetailsServiceImp implements UserDetailsService, org.springframework.security.core.userdetails.UserDetailsService {
 
     public final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImp(UserRepository userRepository,@Lazy PasswordEncoder passwordEncoder) {
+    public UserDetailsServiceImp(UserRepository userRepository, @Lazy PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -55,7 +56,7 @@ public class UserServiceImp implements UserService, UserDetailsService {
             userUp.setUsername(user.getUsername());
             userUp.setLastName(user.getLastName());
             userUp.setAge(user.getAge());
-            userUp.setRoles(user.getRoles());
+            userUp.setRoles(new ArrayList<>(user.getRoles()));
             userUp.setPassword(user.getPassword());
             userRepository.save(userUp);
         } else {
@@ -89,7 +90,6 @@ public class UserServiceImp implements UserService, UserDetailsService {
         if(user == null) {
             throw new UsernameNotFoundException("User is not found");
         }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                mapRolesToAuthority(user.getRoles()));
+        return user;
     }
 }

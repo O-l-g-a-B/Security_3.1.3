@@ -1,6 +1,5 @@
 package ru.kata.spring.boot_security.demo.model;
 
-
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -17,14 +16,16 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "name", unique = true)
     private  String name;
-
+    @Column(name = "username")
     private String username;
-
+    @Column(name = "lastName")
     private String lastName;
-
+    @Column(name = "password")
     private String password;
-
+    @Column(name = "age")
     private Integer age;
 
     @ManyToMany
@@ -33,12 +34,12 @@ public class User implements UserDetails {
             name = "users_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Collection<Role> roles = new HashSet<>();
+    private List<Role> roles;
 
     public User (){
     }
 
-    public User(String name ,String username, String lastName, String password, Integer age, Collection<Role> roles) {
+    public User(String name ,String username, String lastName, String password, Integer age, List<Role> roles) {
         this.name = name;
         this.username = username;
         this.lastName = lastName;
@@ -91,7 +92,7 @@ public class User implements UserDetails {
         return roles;
     }
 
-    public void setRoles(Collection<Role> roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 
